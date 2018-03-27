@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "CommandLine",
+        "repositoryURL": "https://github.com/kinglouie/CommandLine.git",
+        "state": {
+          "branch": null,
+          "revision": "d84febdcfd4e84337bb90692a852cc47ac782af1",
+          "version": "3.1.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -9,6 +9,15 @@
           "revision": "d84febdcfd4e84337bb90692a852cc47ac782af1",
           "version": "3.1.1"
         }
+      },
+      {
+        "package": "CoreGraphicsExtension",
+        "repositoryURL": "https://github.com/kinglouie/CoreGraphicsExtension",
+        "state": {
+          "branch": "master",
+          "revision": "dd5e4fae08e0bf0be7e29b0d0b69fb132cb78f86",
+          "version": null
+        }
       }
     ]
   },

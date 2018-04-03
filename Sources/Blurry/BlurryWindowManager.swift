@@ -1,5 +1,5 @@
 
-import PrivateCG
+import CoreGraphicsExtension
 
 func getTime() -> String
 {
@@ -14,7 +14,7 @@ func getTime() -> String
 
 class BlurryWindowManager
 {
-    var spaceWindowList: [NSNumber: NSWindow] = [:]
+    var spaceWindowList: [CGESpace: NSWindow] = [:]
 
     var height: CGFloat?
     var width: CGFloat?
@@ -37,9 +37,8 @@ class BlurryWindowManager
 
         // create windows
         for scr in NSScreen.screens {
-
             let size = self.getWindowDimensionsforScreen(scr)
-            let currentScreenSpaces = PrivateCG.getSpacesforScreen(scr)
+            let currentScreenSpaces = scr.spaces()
 
             for space in currentScreenSpaces! {
                 if self.spaceWindowList[space] == nil {
@@ -47,17 +46,17 @@ class BlurryWindowManager
                     let windowID = NSNumber.init(value: w.windowNumber)
 
                     // @TODO this may fail if the space was created just now -> fix this by waiting some time
-                    PrivateCG.moveWindow(windowID, toSpace: space)
+                    w.move(to: space)
                     self.spaceWindowList[space] = w
 
                     // debuginfo
                     let displayNr = scr.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")]!
-                    print(getTime(), " Display: ", displayNr, "\t Space: ", space, "\t created Window (", windowID , ")", separator: "")
+                    print(getTime(), " Display: ", displayNr, "\t Space: ", space.number(), "\t created Window (", windowID , ")", separator: "")
                 }
             }
         }
 
-        let currentSpaces = PrivateCG.getAllSpaces()
+        let currentSpaces = CGESpace.all()
         for (space, window) in self.spaceWindowList {
             let windowID = NSNumber.init(value: window.windowNumber)
 
@@ -73,7 +72,7 @@ class BlurryWindowManager
                 // debuginfo
                 let displayNr = window.screen?.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")]!
                 if displayNr != nil {
-                    print(getTime(), " Display: ", displayNr!, "\t Space: ", space, "\t closed Window (", windowID , ")", separator: "")
+                    print(getTime(), " Display: ", displayNr!, "\t Space: ", space.number(), "\t closed Window (", windowID , ")", separator: "")
                 }
             }
         }
@@ -98,7 +97,6 @@ class BlurryWindowManager
         window.displaysWhenScreenProfileChanges = true
         window.hasShadow = shadow
         window.isMovable = false
-        // @TODO, fixes weird segfault, maybe change this in the future
         window.isReleasedWhenClosed = false
         window.orderFrontRegardless()
 

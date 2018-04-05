@@ -65,11 +65,15 @@ class BlurryWindowManager
             var closeWindow = false
             if !(currentSpaces?.contains(space))! {
                 closeWindow = true
-                NSLog("Display: %u, Space: %u (closed), closed Window (%u)", displayNr!, space.number(), windowID)
+                if displayNr != nil {
+                    NSLog("Display: %u, Space: %u (closed), closed Window (%u)", displayNr!, space.number(), windowID)
+                }
             }
             if self.display != nil && displayNr != self.display {
                 closeWindow = true
-                NSLog("Display: %u, Space: %u (moved), closed Window (%u)", displayNr!, space.number(), windowID)
+                if displayNr != nil {
+                    NSLog("Display: %u, Space: %u (moved), closed Window (%u)", displayNr!, space.number(), windowID)
+                }
             }
             if closeWindow {
                 window.close()

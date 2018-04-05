@@ -25,8 +25,11 @@ let shadow = BoolOption(shortFlag: "s", longFlag: "shadow",
   helpMessage: "Wheter or not to draw a window shadow")
 let material = IntOption(shortFlag: "m", longFlag: "material",
   helpMessage: "Window material, this must be an integer between 1-9.")
+let display = IntOption(shortFlag: "d", longFlag: "display",
+    helpMessage: "Display Identifier, this is an Unsigned Integer e.g. 458659626")
 
-cli.addOptions(width, height, top, right, bottom, left, radius, shadow, material)
+
+cli.addOptions(width, height, top, right, bottom, left, radius, shadow, material, display)
 
 do {
   try cli.parse()
@@ -44,6 +47,7 @@ wm.width    = width.value != nil ? CGFloat(width.value!) : nil
 wm.radius   = radius.value != nil ? CGFloat(radius.value!) : wm.radius
 wm.shadow   = shadow.value
 wm.material = material.value != nil ? material.value! : wm.material
+wm.display  = display.value != nil ? UInt(display.value!) : nil
 
 wm.run()
 app.run()

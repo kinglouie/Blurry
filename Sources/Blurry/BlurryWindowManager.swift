@@ -1,17 +1,6 @@
 
 import CoreGraphicsExtension
 
-func getTime() -> String
-{
-    let date = Date()
-    let calendar = Calendar.current
-    let hours = calendar.component(.hour, from: date)
-    let minutes = calendar.component(.minute, from: date)
-    let seconds = calendar.component(.second, from: date)
-
-    return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-}
-
 class BlurryWindowManager
 {
     var spaceWindowList: [CGESpace: NSWindow] = [:]
@@ -28,6 +17,8 @@ class BlurryWindowManager
     var material: Int   = 1
     var shadow: Bool    = false
 
+    var display: UInt?
+
     func run() {
         self.manageWindows()
         Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(self.manageWindows), userInfo: nil, repeats: true)
@@ -39,6 +30,11 @@ class BlurryWindowManager
         for scr in NSScreen.screens {
             let size = self.getWindowDimensionsforScreen(scr)
             let currentScreenSpaces = scr.spaces()
+            let displayNr = scr.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")]! as! UInt
+
+            if (self.display != nil && displayNr != self.display) {
+                continue
+            }
 
             for space in currentScreenSpaces! {
                 if self.spaceWindowList[space] == nil {
@@ -50,29 +46,43 @@ class BlurryWindowManager
                     self.spaceWindowList[space] = w
 
                     // debuginfo
-                    let displayNr = scr.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")]!
-                    print(getTime(), " Display: ", displayNr, "\t Space: ", space.number(), "\t created Window (", windowID , ")", separator: "")
+                    NSLog("Display: %u, Space: %u, created Window (%u)", displayNr, space.number(), windowID)
                 }
             }
         }
 
         let currentSpaces = CGESpace.all()
         for (space, window) in self.spaceWindowList {
+
             let windowID = NSNumber.init(value: window.windowNumber)
+            let displayNr = window.screen?.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")]! as? UInt
 
             // fixes bug that window is not visible on newly creates spaces
             // even if the windowlevel is correct
             window.orderFrontRegardless()
 
-            // check for deleted spaces and close the corresponding windows
+            // close window if space was closed or moved offscreen
+            var closeWindow = false
             if !(currentSpaces?.contains(space))! {
+                closeWindow = true
+                NSLog("Display: %u, Space: %u (closed), closed Window (%u)", displayNr!, space.number(), windowID)
+            }
+            if self.display != nil && displayNr != self.display {
+                closeWindow = true
+                NSLog("Display: %u, Space: %u (moved), closed Window (%u)", displayNr!, space.number(), windowID)
+            }
+            if closeWindow {
                 window.close()
                 self.spaceWindowList.removeValue(forKey: space)
+                break
+            }
 
+            // check window space positions are still correct
+            if (CGESpace.spaces(for: window).first! != space) {
+                window.move(to: space)
                 // debuginfo
-                let displayNr = window.screen?.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")]!
                 if displayNr != nil {
-                    print(getTime(), " Display: ", displayNr!, "\t Space: ", space.number(), "\t closed Window (", windowID , ")", separator: "")
+                    NSLog("Display: %u, Space: %u, moved Window (%u)", displayNr!, space.number(), windowID)
                 }
             }
         }

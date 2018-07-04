@@ -59,7 +59,8 @@ class BlurryWindowManager
 
             // fixes bug that window is not visible on newly creates spaces
             // even if the windowlevel is correct
-            window.orderFrontRegardless()
+            // disabled because of buggy behaviour in Mojave
+            //window.orderFrontRegardless()
 
             // close window if space was closed or moved offscreen
             var closeWindow = false
